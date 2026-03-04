@@ -64,7 +64,10 @@ function App() {
     setIsApiKeyOpen(false);
   };
 
-  const handleInsertActionAsterisks = () => {
+  const handleInsertActionAsterisks = (e) => {
+    // Prevent the button click from stealing focus away from the input (Crucial for iOS)
+    if (e) e.preventDefault();
+
     const input = inputRef.current;
     if (!input) return;
 
@@ -76,11 +79,13 @@ function App() {
 
     setInputMessage(textBefore + '**' + textAfter);
 
-    // Set cursor position between the asterisks
+    // Set cursor position between the asterisks after React state flush
     setTimeout(() => {
-      input.focus();
-      input.setSelectionRange(startPos + 1, startPos + 1);
-    }, 0);
+      if (input) {
+        input.focus();
+        input.setSelectionRange(startPos + 1, startPos + 1);
+      }
+    }, 10);
   };
 
   const handleSendMessage = async (e) => {
@@ -414,7 +419,8 @@ function App() {
               <button
                 type="button"
                 className="action-insert-btn"
-                onClick={handleInsertActionAsterisks}
+                onPointerDown={handleInsertActionAsterisks} // Use pointerDown to catch it before focus blurs
+                onClick={(e) => e.preventDefault()} // Fallback
                 title="행동 묘사 추가 (*)"
                 disabled={isLoading}
               >
