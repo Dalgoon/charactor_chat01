@@ -631,6 +631,28 @@ body {
   /* Chat Area Expand */
   .chat-area {
     width: 100%;
+    position: relative;
+    z-index: 10;
+  }
+
+  .chat-header {
+    padding: 0 16px;
+  }
+
+  .chat-header-info {
+    max-width: 80%;
+  }
+
+  .chat-header-name {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .settings-btn {
+    font-size: 1.4rem;
+    padding: 8px;
   }
 
   /* Message Adjustments */
