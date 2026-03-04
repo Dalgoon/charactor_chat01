@@ -25,13 +25,38 @@ export const defaultCharacters = [
   }
 ];
 
+export const bulkCharacterMap = Array.from({ length: 100 }, (_, i) => ({
+  id: `img_bulk_${i + 1}`,
+  situation: `${i + 1}`, // 기본 태그를 숫자로 지정, 사용자가 앱에서 변경 가능
+  url: `https://rinw.uk/NAS/CUL/${i + 1}.webp`
+}));
+
+export const bulkCharacter = {
+  id: 'char_100',
+  name: '100장 커스텀 캐릭터',
+  avatar: 'https://rinw.uk/NAS/CUL/1.webp',
+  model: 'gemini-2.5-flash',
+  systemPrompt: `이 캐릭터는 100장의 이미지가 연동되어 있습니다. 상황에 맞게 대화하세요.\n\n[스토리텔링 및 묘사 지시]\n대화 형태뿐만 아니라 구체적인 상황 묘사와 행동 묘사를 소설처럼 디테일하게 서술해.`,
+  greeting: "100장 이미지 캐릭터 세팅 완료!",
+  imageMap: bulkCharacterMap,
+  messages: []
+};
+
 export const loadCharacters = () => {
   const data = localStorage.getItem(LOCAL_STORAGE_KEY);
   if (!data) {
-    saveCharacters(defaultCharacters);
-    return defaultCharacters;
+    const initialChars = [...defaultCharacters, bulkCharacter];
+    saveCharacters(initialChars);
+    return initialChars;
   }
-  return JSON.parse(data);
+
+  const parsed = JSON.parse(data);
+  // 기존 유저의 로컬 스토리지 데이터에 char_100이 없다면 자동 추가
+  if (!parsed.find(c => c.id === 'char_100')) {
+    parsed.push(bulkCharacter);
+    saveCharacters(parsed);
+  }
+  return parsed;
 };
 
 export const saveCharacters = (characters) => {
