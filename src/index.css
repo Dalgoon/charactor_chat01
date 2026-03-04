@@ -311,28 +311,41 @@ body {
   border-bottom-left-radius: 4px;
 }
 
-.msg-delete-btn {
+.message-actions {
+  display: flex;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.message-wrapper.user .message-actions {
+  align-self: flex-end;
+}
+
+.message-wrapper:hover .message-actions {
+  opacity: 1;
+}
+
+.msg-action-btn {
   background: none;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
   font-size: 0.9rem;
-  padding: 4px 8px;
-  opacity: 0;
-  transition: opacity 0.2s, color 0.2s;
-  align-self: flex-start;
-  margin-top: 4px;
+  padding: 4px;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.message-wrapper.user .msg-delete-btn {
-  align-self: flex-end;
+.msg-action-btn:hover {
+  color: var(--primary-color);
 }
 
-.message-wrapper:hover .msg-delete-btn {
-  opacity: 1;
-}
-
-.msg-delete-btn:hover {
+.msg-action-btn[title="메시지 삭제"]:hover {
   color: #ef4444;
 }
 
@@ -672,6 +685,11 @@ body {
   .message-wrapper {
     max-width: 95%;
     min-width: 0;
+  }
+
+  .message-actions {
+    opacity: 1;
+    /* Always visible on mobile since hover is tricky */
   }
 
   .message-image-container {

@@ -14,8 +14,10 @@ import {
   FiX,
   FiKey,
   FiImage,
-  FiMenu
+  FiMenu,
+  FiCopy
 } from 'react-icons/fi';
+import defaultMiaPrompt from '../[미아그린]시스템프롬프트.txt?raw';
 
 function App() {
   const [characters, setCharacters] = useState([]);
@@ -182,10 +184,10 @@ function App() {
   const handleAddNewCharacter = () => {
     setEditingChar({
       id: 'new_' + Date.now(),
-      name: '',
+      name: '미아 그린',
       avatar: 'https://i.imgur.com/your-avatar.jpg',
       model: 'gemini-2.5-flash',
-      systemPrompt: '',
+      systemPrompt: defaultMiaPrompt,
       greeting: '안녕?',
       maxImages: 1, // Default limit
       imageMap: [{ id: 'img_' + Date.now(), situation: '평온', url: '' }],
@@ -213,6 +215,14 @@ function App() {
   const handleDeleteCharacterFromSidebar = (e, id) => {
     e.stopPropagation();
     handleDeleteCharacter(id);
+  };
+
+  const handleCopyMessage = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      // alert('메시지가 복사되었습니다.');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
   };
 
   const handleDeleteMessage = (messageId) => {
@@ -389,13 +399,22 @@ function App() {
                   <div className="message-bubble" style={{ position: 'relative' }}>
                     {renderMessageText(msg.text)}
                   </div>
-                  <button
-                    className="msg-delete-btn"
-                    onClick={() => handleDeleteMessage(msg.id)}
-                    title="메시지 삭제"
-                  >
-                    <FiTrash2 />
-                  </button>
+                  <div className="message-actions">
+                    <button
+                      className="msg-action-btn"
+                      onClick={() => handleCopyMessage(msg.rawText || msg.text)}
+                      title="메시지 복사"
+                    >
+                      <FiCopy />
+                    </button>
+                    <button
+                      className="msg-action-btn"
+                      onClick={() => handleDeleteMessage(msg.id)}
+                      title="메시지 삭제"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
                 </div>
 
                 {msg.role === 'user' && (
