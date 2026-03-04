@@ -278,6 +278,15 @@ body {
   /* 줄바꿈(엔터) 처리를 위해 추가 */
 }
 
+.action-text {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.message-wrapper.user .action-text {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .message-wrapper.user .message-bubble {
   background-color: var(--primary-color);
   color: white;
@@ -366,6 +375,29 @@ body {
 
 .message-input::placeholder {
   color: var(--text-muted);
+}
+
+.action-insert-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.action-insert-btn:hover:not(:disabled) {
+  color: var(--primary-color);
+}
+
+.action-insert-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .send-btn {

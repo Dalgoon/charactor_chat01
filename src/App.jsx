@@ -31,6 +31,7 @@ function App() {
   const [editingChar, setEditingChar] = useState(null);
 
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     // Load initial data
@@ -59,6 +60,25 @@ function App() {
     localStorage.setItem('gemini_api_key', key);
     setApiKey(key);
     setIsApiKeyOpen(false);
+  };
+
+  const handleInsertActionAsterisks = () => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const startPos = input.selectionStart || inputMessage.length;
+    const endPos = input.selectionEnd || inputMessage.length;
+
+    const textBefore = inputMessage.substring(0, startPos);
+    const textAfter = inputMessage.substring(endPos, inputMessage.length);
+
+    setInputMessage(textBefore + '**' + textAfter);
+
+    // Set cursor position between the asterisks
+    setTimeout(() => {
+      input.focus();
+      input.setSelectionRange(startPos + 1, startPos + 1);
+    }, 0);
   };
 
   const handleSendMessage = async (e) => {
@@ -135,6 +155,19 @@ function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const renderMessageText = (text) => {
+    if (!text) return '';
+    const parts = text.split('*');
+    if (parts.length === 1) return text;
+
+    return parts.map((part, index) => {
+      if (index % 2 === 1) {
+        return <span key={index} className="action-text">*{part}*</span>;
+      }
+      return part;
+    });
   };
 
   // Character Management
@@ -327,7 +360,7 @@ function App() {
                   )}
 
                   <div className="message-bubble" style={{ position: 'relative' }}>
-                    {msg.text}
+                    {renderMessageText(msg.text)}
                   </div>
                   <button
                     className="msg-delete-btn"
@@ -363,7 +396,17 @@ function App() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 disabled={isLoading}
+                ref={inputRef}
               />
+              <button
+                type="button"
+                className="action-insert-btn"
+                onClick={handleInsertActionAsterisks}
+                title="행동 묘사 추가 (*)"
+                disabled={isLoading}
+              >
+                [*]
+              </button>
               <button type="submit" className="send-btn" disabled={isLoading || !inputMessage.trim()}>
                 <FiSend />
               </button>
