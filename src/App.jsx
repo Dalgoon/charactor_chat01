@@ -132,15 +132,16 @@ function App() {
       );
 
       // 2. Parse Contextual Tags (e.g. [기쁨] 안녕!)
-      // If parsing fails or doesn't find a tag, situationUrl will fall back to default avatar
-      const { cleanText, situationUrl } = parseSituationFromText(rawResponse, currentChar);
+      // If parsing fails or doesn't find a tag, situationUrls will fall back to default avatar if any tags were present
+      const { cleanText, situationUrls, situationUrl } = parseSituationFromText(rawResponse, currentChar);
 
       const aiMessage = {
         id: (Date.now() + 1).toString(),
         role: 'model',
         text: cleanText,
         rawText: rawResponse, // Store for debugging if needed
-        situationUrl: situationUrl,
+        situationUrl: situationUrl, // Fallback for existing messages
+        situationUrls: situationUrls, // Array of URLs
         timestamp: Date.now()
       };
 
@@ -365,17 +366,24 @@ function App() {
                     src={activeChar.avatar}
                     alt="avatar"
                     className="message-avatar"
-                    style={{ visibility: msg.situationUrl ? 'hidden' : 'visible' }}
+                    style={{ visibility: (msg.situationUrl || (msg.situationUrls && msg.situationUrls.length > 0)) ? 'hidden' : 'visible' }}
                   />
                 )}
 
                 <div className="message-content">
                   {/* Contextual Image (If exists and is AI) */}
-                  {msg.role === 'model' && msg.situationUrl && msg.situationUrl !== activeChar.avatar && (
+                  {/* For backward compatibility with older string url (if situationUrls doesn't exist) */}
+                  {msg.role === 'model' && !msg.situationUrls && msg.situationUrl && msg.situationUrl !== activeChar.avatar && (
                     <div className="message-image-container">
                       <img src={msg.situationUrl} alt="situation" className="message-image" />
                     </div>
                   )}
+                  {/* For new array of urls */}
+                  {msg.role === 'model' && Array.isArray(msg.situationUrls) && msg.situationUrls.filter(url => url !== activeChar.avatar).map((url, idx) => (
+                    <div key={idx} className="message-image-container">
+                      <img src={url} alt={`situation-${idx}`} className="message-image" />
+                    </div>
+                  ))}
 
                   <div className="message-bubble" style={{ position: 'relative' }}>
                     {renderMessageText(msg.text)}

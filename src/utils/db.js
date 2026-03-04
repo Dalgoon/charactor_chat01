@@ -218,26 +218,34 @@ export const saveCharacters = (characters) => {
 };
 
 export const parseSituationFromText = (text, character) => {
-  // text 예시: "[부끄러움] 아, 뭐라는거야 진짜..." 또는 줄바꿈 후 "[기쁨]" 등
-  // ^ 제거하여 텍스트 중간이나 앞에 공백이 있어도 첫 번째 대괄호 태그를 찾도록 완화
-  const match = text.match(/\[(.*?)\]/);
-  let situationUrl = null;
-  let cleanText = text;
+  // HTML 태그와 주석 제거 (예: <br>, <b>, <img> 등)
+  let strippedText = text.replace(/<!--[\s\S]*?-->/g, '').replace(/<\/?[a-z][a-z0-9]*[^>]*>/ig, '');
 
-  if (match) {
-    const situation = match[1];
-    cleanText = text.replace(/\[.*?\]\s*/, '').trim(); // 첫 번째 태그만 제거하고 공백 정리
+  const matches = [...strippedText.matchAll(/\[(.*?)\]/g)];
+  let situationUrls = [];
+  let cleanText = strippedText;
 
-    // imageMap에서 일치하는 상황 찾기
-    const foundImage = character.imageMap.find(img => img.situation === situation);
-    if (foundImage) {
-      situationUrl = foundImage.url;
-    } else {
-      // 매칭되는 이미지가 없으면 기본 아바타 (또는 '평온' 이미지)
-      const defaultImg = character.imageMap.find(img => img.situation === '평온');
-      situationUrl = defaultImg ? defaultImg.url : character.avatar;
-    }
+  if (matches.length > 0) {
+    matches.forEach(match => {
+      const situation = match[1];
+      const foundImage = character.imageMap.find(img => img.situation === situation);
+      if (foundImage) {
+        situationUrls.push(foundImage.url);
+      } else {
+        const defaultImg = character.imageMap.find(img => img.situation === '평온');
+        situationUrls.push(defaultImg ? defaultImg.url : character.avatar);
+      }
+    });
+
+    // 중복 URL 제거 (선택적)
+    situationUrls = [...new Set(situationUrls)];
+
+    // 텍스트에서 모든 상태 태그 삭제
+    cleanText = cleanText.replace(/\[.*?\]\s*/g, '').trim();
   }
 
-  return { cleanText, situationUrl };
+  // Fallback for older message format compatibility where situationUrl was a single string
+  const situationUrl = situationUrls.length > 0 ? situationUrls[0] : null;
+
+  return { cleanText, situationUrls, situationUrl };
 };
