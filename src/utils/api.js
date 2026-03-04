@@ -33,14 +33,28 @@ export const generateChatResponse = async (ai, character, chatHistory, userMessa
             const situationsList = character.imageMap.map(img => `[${img.situation}]`).join(', ');
             const requiredImageCount = character.maxImages || 1;
 
-            systemInstruction += `\n\n[최우선 필수 지시사항]
-대화의 맥락에 따라 현재 당신의 감정이나 상황을 파악하여, *반드시* 답변의 가장 첫 부분에 다음 중 하나의 태그를 대괄호로 감싸서 출력하십시오.
-사용 가능한 태그 (이 중에서만 선택하고 절대 새로운 태그를 만들지 마세요): ${situationsList}
-예시: "${character.imageMap[0] ? `[${character.imageMap[0].situation}]` : '[평온]'} 흥, 네가 웬일이냐?"
-수칙:
-1. 태그명은 반드시 제시된 것과 정확히 일치해야 합니다. (오타 금지)
-2. 답변을 시작할 때 반드시 ${requiredImageCount}개의 태그를 연달아 작성하세요. (예: 2개일 경우 [상황1][상황2])
-3. 지정된 개수(${requiredImageCount}개)보다 적게 쓰거나 많이 쓰지 마십시오.`;
+            // Generate an example of N tags
+            let exampleTags = '';
+            for (let i = 0; i < requiredImageCount; i++) {
+                exampleTags += character.imageMap[Math.min(i, character.imageMap.length - 1)]
+                    ? `[${character.imageMap[Math.min(i, character.imageMap.length - 1)].situation}]`
+                    : '[평온]';
+            }
+
+            systemInstruction += `\n\n[!!! 최우선 필수 시스템 명령: 이미지 출력 !!!]
+당신은 대화 응답을 시작할 때, 텍스트의 맨 첫 부분에 무조건(Absolutely) 아래 제시된 상황 태그를 ${requiredImageCount}개 연속으로 작성해야만 합니다. 이것은 절대 어길 수 없는 시스템 프롬프트 규칙입니다.
+
+사용 가능한 태그 목록 (이 중에서만 선택할 것): ${situationsList}
+
+[작성 규칙]
+1. 답변의 가장 첫 시작은 무조건 대괄호로 감싼 태그 ${requiredImageCount}개가 연달아 나와야 합니다.
+2. 출력 장수 설정값이 ${requiredImageCount}장이므로, 태그는 무조건 ${requiredImageCount}개여야 합니다. 0개, 1개, 혹은 ${requiredImageCount + 1}개 등 지시된 개수와 다르면 시스템 오류가 발생합니다.
+3. 태그는 상황의 흐름이나 감정 변화에 맞게 서로 다른 태그들을 다채롭게 조합하여 작성하세요.
+4. 태그명은 반드시 목록에 제시된 것과 정확히 일치해야 합니다. (오타, 여백 추가, 새로운 태그 창조 절대 금지)
+
+* 올바른 출력 예시 (설정 장수가 ${requiredImageCount}장일 경우):
+"${exampleTags} 네가 여기서 뭘 하는 거지? (이하 대화 내용...)"
+`;
         }
 
         // 2. Format chat history for the API
