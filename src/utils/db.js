@@ -223,8 +223,10 @@ export const parseSituationFromText = (text, character) => {
   let cleanText = strippedText;
 
   if (matches.length > 0) {
+    console.log(`\n=========================================\n[이미지 출력 시도됨] 텍스트 원본:`, text);
     matches.forEach(match => {
       const situationTag = match[1].trim();
+      console.log(`포착된 태그: [${situationTag}]`);
 
       // 1. Exact match first
       let foundImage = character.imageMap.find(img => img.situation === situationTag);
@@ -243,15 +245,26 @@ export const parseSituationFromText = (text, character) => {
             mapKeywords.some(mk => mk.includes(keyword) || keyword.includes(mk))
           );
         });
+
+        if (foundImage) {
+          console.log(`✅ 유사 태그 매칭 성공: [${situationTag}] -> 맵에 등록된 [${foundImage.situation}]`);
+        }
+      } else {
+        console.log(`✅ 정확히 일치하는 태그 발견: [${situationTag}]`);
       }
 
       if (foundImage) {
         situationUrls.push(foundImage.url);
+        console.log(`   -> 적용된 이미지 주소: ${foundImage.url}`);
       } else {
         const defaultImg = character.imageMap.find(img => img.situation === '평온');
-        situationUrls.push(defaultImg ? defaultImg.url : character.avatar);
+        const defaultUrl = defaultImg ? defaultImg.url : character.avatar;
+        situationUrls.push(defaultUrl);
+        console.log(`❌ 매칭 실패! 기본 이미지(평온)로 대체됨`);
+        console.log(`   -> 적용된 이미지 주소: ${defaultUrl}`);
       }
     });
+    console.log(`=========================================\n`);
 
     // 중복 URL 제거 (선택적)
     situationUrls = [...new Set(situationUrls)];
