@@ -319,7 +319,6 @@ function App() {
     setEditingPersona({
       id: 'user_' + Date.now(),
       name: '새 주인공',
-      avatar: 'https://via.placeholder.com/48?text=New',
       personaPrompt: ''
     });
     setIsPersonaSettingsOpen(true);
@@ -400,8 +399,7 @@ function App() {
               className={`persona-card ${activePersonaId === p.id ? 'active' : ''}`}
               onClick={() => setActivePersonaId(p.id)}
             >
-              <img src={p.avatar} alt={p.name} className="persona-card-avatar" />
-              <div className="persona-card-name">{p.name}</div>
+              <div className="persona-card-name" style={{ marginTop: '10px' }}>{p.name}</div>
               <button
                 className="persona-card-settings-btn"
                 onClick={(e) => {
@@ -447,17 +445,6 @@ function App() {
                     value={editingPersona.name}
                     onChange={(e) => setEditingPersona({ ...editingPersona, name: e.target.value })}
                     placeholder="예: 건방진 학생"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">아이콘 (URL)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={editingPersona.avatar}
-                    onChange={(e) => setEditingPersona({ ...editingPersona, avatar: e.target.value })}
-                    placeholder="아이콘 이미지 링크"
                   />
                 </div>
 
@@ -615,14 +602,6 @@ function App() {
                     </button>
                   </div>
                 </div>
-
-                {msg.role === 'user' && (
-                  <img
-                    src={activePersona?.avatar || 'https://via.placeholder.com/36'}
-                    alt="user avatar"
-                    className="message-avatar"
-                  />
-                )}
               </div>
             ))}
             {isLoading && (
@@ -675,268 +654,275 @@ function App() {
           </header>
           <div style={{ color: 'var(--text-muted)' }}>왼쪽에서 캐릭터를 선택하거나 새로 생성해주세요.</div>
         </main>
-      )}
+      )
+      }
 
       {/* Character Settings Modal */}
-      {isSettingsOpen && editingChar && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2 className="modal-title">{editingChar.id.startsWith('new_') ? '새 캐릭터 만들기' : '캐릭터 설정'}</h2>
-              <button className="close-btn" onClick={() => setIsSettingsOpen(false)}><FiX /></button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label className="form-label">이름</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editingChar.name}
-                  onChange={(e) => setEditingChar({ ...editingChar, name: e.target.value })}
-                  placeholder="캐릭터 이름"
-                />
+      {
+        isSettingsOpen && editingChar && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h2 className="modal-title">{editingChar.id.startsWith('new_') ? '새 캐릭터 만들기' : '캐릭터 설정'}</h2>
+                <button className="close-btn" onClick={() => setIsSettingsOpen(false)}><FiX /></button>
               </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">이름</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={editingChar.name}
+                    onChange={(e) => setEditingChar({ ...editingChar, name: e.target.value })}
+                    placeholder="캐릭터 이름"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label className="form-label">기본 프로필 아이콘 (URL)</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editingChar.avatar}
-                  onChange={(e) => setEditingChar({ ...editingChar, avatar: e.target.value })}
-                  placeholder="Imgur 등 이미지 링크"
-                />
-              </div>
+                <div className="form-group">
+                  <label className="form-label">기본 프로필 아이콘 (URL)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={editingChar.avatar}
+                    onChange={(e) => setEditingChar({ ...editingChar, avatar: e.target.value })}
+                    placeholder="Imgur 등 이미지 링크"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label className="form-label">AI 모델 선택</label>
-                <select
-                  className="form-input"
-                  value={editingChar.model || 'gemini-2.5-flash'}
-                  onChange={(e) => setEditingChar({ ...editingChar, model: e.target.value })}
-                  style={{ backgroundColor: 'var(--bg-dark)' }}
-                >
-                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (기본/빠름/저렴)</option>
-                  <option value="gemini-2.5-pro">Gemini 2.5 Pro (고성능/긴 글/유료 전환시 주의)</option>
-                </select>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Pro 모델은 추론 능력이 뛰어나고 더 긴 글을 작성하지만, 무료 한도를 초과하면 과금될 수 있습니다.</p>
-              </div>
+                <div className="form-group">
+                  <label className="form-label">AI 모델 선택</label>
+                  <select
+                    className="form-input"
+                    value={editingChar.model || 'gemini-2.5-flash'}
+                    onChange={(e) => setEditingChar({ ...editingChar, model: e.target.value })}
+                    style={{ backgroundColor: 'var(--bg-dark)' }}
+                  >
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (기본/빠름/저렴)</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro (고성능/긴 글/유료 전환시 주의)</option>
+                  </select>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Pro 모델은 추론 능력이 뛰어나고 더 긴 글을 작성하지만, 무료 한도를 초과하면 과금될 수 있습니다.</p>
+                </div>
 
-              <div className="form-group">
-                <label className="form-label">첫 인사말 (줄바꿈 가능)</label>
-                <textarea
-                  className="form-textarea"
-                  value={editingChar.greeting}
-                  onChange={(e) => setEditingChar({ ...editingChar, greeting: e.target.value })}
-                  style={{ height: '80px' }}
-                />
-              </div>
+                <div className="form-group">
+                  <label className="form-label">첫 인사말 (줄바꿈 가능)</label>
+                  <textarea
+                    className="form-textarea"
+                    value={editingChar.greeting}
+                    onChange={(e) => setEditingChar({ ...editingChar, greeting: e.target.value })}
+                    style={{ height: '80px' }}
+                  />
+                </div>
 
-              <div className="form-group">
-                <label className="form-label">성격 및 배경 설정 (시스템 프롬프트)</label>
-                <textarea
-                  className="form-textarea"
-                  value={editingChar.systemPrompt}
-                  onChange={(e) => setEditingChar({ ...editingChar, systemPrompt: e.target.value })}
-                  placeholder="예: 너는 츤데레 10년지기 소꿉친구야..."
-                  style={{ height: '150px' }}
-                />
-              </div>
+                <div className="form-group">
+                  <label className="form-label">성격 및 배경 설정 (시스템 프롬프트)</label>
+                  <textarea
+                    className="form-textarea"
+                    value={editingChar.systemPrompt}
+                    onChange={(e) => setEditingChar({ ...editingChar, systemPrompt: e.target.value })}
+                    placeholder="예: 너는 츤데레 10년지기 소꿉친구야..."
+                    style={{ height: '150px' }}
+                  />
+                </div>
 
-              <div className="form-group" style={{ marginBottom: '10px' }}>
-                <label className="form-label">기본 출력 이미지 장수 (필수) 🖼️</label>
-                <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
-                  {[1, 2, 3].map(num => (
-                    <label key={num} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        name="maxImages"
-                        value={num}
-                        checked={(editingChar.maxImages || 1) == num}
-                        onChange={(e) => setEditingChar({ ...editingChar, maxImages: parseInt(e.target.value) })}
-                        style={{ accentColor: 'var(--primary-color)', width: '16px', height: '16px' }}
-                      />
-                      <span>{num}장</span>
+                <div className="form-group" style={{ marginBottom: '10px' }}>
+                  <label className="form-label">기본 출력 이미지 장수 (필수) 🖼️</label>
+                  <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
+                    {[1, 2, 3].map(num => (
+                      <label key={num} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="maxImages"
+                          value={num}
+                          checked={(editingChar.maxImages || 1) == num}
+                          onChange={(e) => setEditingChar({ ...editingChar, maxImages: parseInt(e.target.value) })}
+                          style={{ accentColor: 'var(--primary-color)', width: '16px', height: '16px' }}
+                        />
+                        <span>{num}장</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>AI가 답변당 반드시 출력하게 될 이미지 개수를 지정합니다.</p>
+                </div>
+
+                <div className="form-group" style={{
+                  backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                  padding: '16px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(99, 102, 241, 0.2)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <label className="form-label" style={{ color: 'var(--primary-color)' }}>
+                      <FiImage style={{ marginRight: '5px' }} />상황별 이미지 링크 설정
                     </label>
-                  ))}
+                    <button className="image-map-btn" onClick={addImageMapRow}>+ 추가</button>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.4' }}>
+                    입력한 '상황(예: 기쁨, 화남)'을 AI가 텍스트 맨 앞에 [기쁨] 과 같이 삽입하면, 매핑된 이미지가 채팅창에 큰 화면으로 출력됩니다. Imgur 링크 리스트를 구성하세요.
+                  </p>
+
+                  <div className="image-map-list">
+                    {editingChar.imageMap?.map((img) => (
+                      <div key={img.id} className="image-map-item">
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="상황 (예: 기쁨)"
+                          style={{ width: '100px' }}
+                          value={img.situation}
+                          onChange={(e) => updateImageMapRow(img.id, 'situation', e.target.value)}
+                        />
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="이미지 URL (예: https://imgur...)"
+                          style={{ flex: 1 }}
+                          value={img.url}
+                          onChange={(e) => updateImageMapRow(img.id, 'url', e.target.value)}
+                        />
+                        {img.url ? (
+                          <img src={img.url} alt="preview" className="image-preview-mini" onError={(e) => e.target.style.display = 'none'} />
+                        ) : (
+                          <div className="image-preview-mini"></div>
+                        )}
+                        <button className="remove-map-btn" onClick={() => removeImageMapRow(img.id)}><FiTrash2 /></button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>AI가 답변당 반드시 출력하게 될 이미지 개수를 지정합니다.</p>
+
               </div>
-
-              <div className="form-group" style={{
-                backgroundColor: 'rgba(99, 102, 241, 0.05)',
-                padding: '16px',
-                borderRadius: '8px',
-                border: '1px solid rgba(99, 102, 241, 0.2)'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <label className="form-label" style={{ color: 'var(--primary-color)' }}>
-                    <FiImage style={{ marginRight: '5px' }} />상황별 이미지 링크 설정
-                  </label>
-                  <button className="image-map-btn" onClick={addImageMapRow}>+ 추가</button>
+              <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
+                {!editingChar.id.startsWith('new_') ? (
+                  <button className="btn-secondary" style={{ color: '#ef4444', borderColor: '#ef4444' }} onClick={() => handleDeleteCharacter(editingChar.id)}>
+                    캐릭터 삭제
+                  </button>
+                ) : <div></div>}
+                <div className="form-group">
+                  <label className="form-label">이 캐릭터와 대화할 내 페르소나 (주인공)</label>
+                  <select
+                    value={activePersonaId || ''}
+                    onChange={(e) => setActivePersonaId(e.target.value)}
+                    className="form-input"
+                  >
+                    {personas.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    이 대화방에서 내가 어떤 주인공으로 롤플레잉할지 설정합니다.
+                  </div>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.4' }}>
-                  입력한 '상황(예: 기쁨, 화남)'을 AI가 텍스트 맨 앞에 [기쁨] 과 같이 삽입하면, 매핑된 이미지가 채팅창에 큰 화면으로 출력됩니다. Imgur 링크 리스트를 구성하세요.
-                </p>
 
-                <div className="image-map-list">
-                  {editingChar.imageMap?.map((img) => (
-                    <div key={img.id} className="image-map-item">
-                      <input
-                        type="text"
-                        className="form-input"
-                        placeholder="상황 (예: 기쁨)"
-                        style={{ width: '100px' }}
-                        value={img.situation}
-                        onChange={(e) => updateImageMapRow(img.id, 'situation', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        className="form-input"
-                        placeholder="이미지 URL (예: https://imgur...)"
-                        style={{ flex: 1 }}
-                        value={img.url}
-                        onChange={(e) => updateImageMapRow(img.id, 'url', e.target.value)}
-                      />
-                      {img.url ? (
-                        <img src={img.url} alt="preview" className="image-preview-mini" onError={(e) => e.target.style.display = 'none'} />
-                      ) : (
-                        <div className="image-preview-mini"></div>
-                      )}
-                      <button className="remove-map-btn" onClick={() => removeImageMapRow(img.id)}><FiTrash2 /></button>
-                    </div>
-                  ))}
+                <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                  <button className="btn-secondary" onClick={() => setIsSettingsOpen(false)}>취소</button>
+                  <button className="btn-primary" onClick={saveEditedCharacter}>
+                    {editingChar.id.startsWith('new_') ? '설정 저장 후 대화 시작' : '저장하기'}
+                  </button>
                 </div>
-              </div>
-
-            </div>
-            <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
-              {!editingChar.id.startsWith('new_') ? (
-                <button className="btn-secondary" style={{ color: '#ef4444', borderColor: '#ef4444' }} onClick={() => handleDeleteCharacter(editingChar.id)}>
-                  캐릭터 삭제
-                </button>
-              ) : <div></div>}
-              <div className="form-group">
-                <label className="form-label">이 캐릭터와 대화할 내 페르소나 (주인공)</label>
-                <select
-                  value={activePersonaId || ''}
-                  onChange={(e) => setActivePersonaId(e.target.value)}
-                  className="form-input"
-                >
-                  {personas.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  이 대화방에서 내가 어떤 주인공으로 롤플레잉할지 설정합니다.
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
-                <button className="btn-secondary" onClick={() => setIsSettingsOpen(false)}>취소</button>
-                <button className="btn-primary" onClick={saveEditedCharacter}>
-                  {editingChar.id.startsWith('new_') ? '설정 저장 후 대화 시작' : '저장하기'}
-                </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* User Persona Settings Modal - Kept here so it can be opened from Sidebar if needed later, but primarily opened from Main Screen now */}
-      {isPersonaSettingsOpen && editingPersona && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2 className="modal-title">{editingPersona.id.startsWith('user_') && !personas.find(p => p.id === editingPersona.id) ? '새 주인공 만들기' : '내 주인공(페르소나) 설정'}</h2>
-              <button className="close-btn" onClick={() => setIsPersonaSettingsOpen(false)}><FiX /></button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label className="form-label">이름</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editingPersona.name}
-                  onChange={(e) => setEditingPersona({ ...editingPersona, name: e.target.value })}
-                  placeholder="예: 건방진 학생"
-                />
+      {
+        isPersonaSettingsOpen && editingPersona && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h2 className="modal-title">{editingPersona.id.startsWith('user_') && !personas.find(p => p.id === editingPersona.id) ? '새 주인공 만들기' : '내 주인공(페르소나) 설정'}</h2>
+                <button className="close-btn" onClick={() => setIsPersonaSettingsOpen(false)}><FiX /></button>
               </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">이름</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={editingPersona.name}
+                    onChange={(e) => setEditingPersona({ ...editingPersona, name: e.target.value })}
+                    placeholder="예: 건방진 학생"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label className="form-label">아이콘 (URL)</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editingPersona.avatar}
-                  onChange={(e) => setEditingPersona({ ...editingPersona, avatar: e.target.value })}
-                  placeholder="아이콘 이미지 링크"
-                />
-              </div>
+                <div className="form-group">
+                  <label className="form-label">아이콘 (URL)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={editingPersona.avatar}
+                    onChange={(e) => setEditingPersona({ ...editingPersona, avatar: e.target.value })}
+                    placeholder="아이콘 이미지 링크"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label className="form-label">주인공 성격 및 배경 설정 (프롬프트 주입)</label>
-                <textarea
-                  className="form-textarea"
-                  value={editingPersona.personaPrompt}
-                  onChange={(e) => setEditingPersona({ ...editingPersona, personaPrompt: e.target.value })}
-                  placeholder="AI에게 인식될 내 설정입니다. 예: 매사에 건방지고 도발적이다."
-                  style={{ height: '150px' }}
-                />
+                <div className="form-group">
+                  <label className="form-label">주인공 성격 및 배경 설정 (프롬프트 주입)</label>
+                  <textarea
+                    className="form-textarea"
+                    value={editingPersona.personaPrompt}
+                    onChange={(e) => setEditingPersona({ ...editingPersona, personaPrompt: e.target.value })}
+                    placeholder="AI에게 인식될 내 설정입니다. 예: 매사에 건방지고 도발적이다."
+                    style={{ height: '150px' }}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
-              {(!editingPersona.id.startsWith('user_') || personas.find(p => p.id === editingPersona.id)) ? (
-                <button className="btn-secondary" style={{ color: '#ef4444', borderColor: '#ef4444' }} onClick={() => handleDeletePersona(editingPersona.id)}>
-                  프로필 삭제
-                </button>
-              ) : <div></div>}
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button className="btn-secondary" onClick={() => setIsPersonaSettingsOpen(false)}>취소</button>
-                <button className="btn-primary" onClick={saveEditedPersona}>저장하기</button>
+              <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
+                {(!editingPersona.id.startsWith('user_') || personas.find(p => p.id === editingPersona.id)) ? (
+                  <button className="btn-secondary" style={{ color: '#ef4444', borderColor: '#ef4444' }} onClick={() => handleDeletePersona(editingPersona.id)}>
+                    프로필 삭제
+                  </button>
+                ) : <div></div>}
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button className="btn-secondary" onClick={() => setIsPersonaSettingsOpen(false)}>취소</button>
+                  <button className="btn-primary" onClick={saveEditedPersona}>저장하기</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* API Key Modal */}
-      {isApiKeyOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '500px' }}>
-            <div className="modal-header">
-              <h2 className="modal-title">Gemini API Key 설정</h2>
-            </div>
-            <div className="modal-body">
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '10px' }}>
-                이 앱은 Google AI Studio (개발자 모드) API를 사용합니다.
-                aistudio.google.com 에서 발급받은 키를 입력해주세요. <br />
-                (주의: 키는 브라우저 내부(localStorage)에만 안전하게 저장됩니다.)
-              </p>
-              <div className="form-group">
-                <input
-                  type="password"
-                  className="form-input"
-                  placeholder="AIza..."
-                  defaultValue={apiKey}
-                  id="api-key-input"
-                />
+      {
+        isApiKeyOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ maxWidth: '500px' }}>
+              <div className="modal-header">
+                <h2 className="modal-title">Gemini API Key 설정</h2>
+              </div>
+              <div className="modal-body">
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '10px' }}>
+                  이 앱은 Google AI Studio (개발자 모드) API를 사용합니다.
+                  aistudio.google.com 에서 발급받은 키를 입력해주세요. <br />
+                  (주의: 키는 브라우저 내부(localStorage)에만 안전하게 저장됩니다.)
+                </p>
+                <div className="form-group">
+                  <input
+                    type="password"
+                    className="form-input"
+                    placeholder="AIza..."
+                    defaultValue={apiKey}
+                    id="api-key-input"
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                {apiKey && <button className="btn-secondary" onClick={() => setIsApiKeyOpen(false)}>닫기</button>}
+                <button
+                  className="btn-primary"
+                  onClick={() => handleSaveApiKey(document.getElementById('api-key-input').value)}
+                >
+                  저장
+                </button>
               </div>
             </div>
-            <div className="modal-footer">
-              {apiKey && <button className="btn-secondary" onClick={() => setIsApiKeyOpen(false)}>닫기</button>}
-              <button
-                className="btn-primary"
-                onClick={() => handleSaveApiKey(document.getElementById('api-key-input').value)}
-              >
-                저장
-              </button>
-            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-    </div>
+    </div >
   );
 }
 

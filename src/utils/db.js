@@ -6,16 +6,21 @@ import defaultMiaPrologue from '../../미아그린 프롤로그.txt?raw';
 
 export const defaultPersonas = [
   {
-    id: 'user_default',
-    name: '유저',
-    avatar: 'https://via.placeholder.com/48?text=U',
+    id: 'user_default_1',
+    name: '익명',
     personaPrompt: '나는 평범한 학생이다.'
   },
   {
-    id: 'user_confident',
-    name: '건방진 학생',
-    avatar: 'https://via.placeholder.com/48?text=C',
-    personaPrompt: '나는 매사에 자신감이 넘치고, 교사 앞에서도 절대 기죽지 않는 건방지고 도발적인 학생이다. 반말과 존댓말을 섞어 쓴다.'
+    id: 'user_default_2',
+    name: '건방진 녀석',
+    personaPrompt: '상대방을 무시하고 깔보는 성격이다.'
+  },
+  {
+    id: 'user_default_3',
+    name: '선생님',
+    personaPrompt: `나는 이 학교에 갓 부임한 초보 교사다.
+어딘가 어설프고, 담당 학급의 불량 학생들에게 기가 눌리곤 한다.
+학생들을 바른 길로 이끌고 싶어하지만 마음대로 되지 않는다.`
   }
 ];
 
