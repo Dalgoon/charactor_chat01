@@ -1,14 +1,18 @@
 :root {
-  --primary-color: #6366f1; /* Indigo 500 */
+  --primary-color: #6366f1;
+  /* Indigo 500 */
   --primary-hover: #4f46e5;
-  --bg-dark: #0f172a; /* Slate 900 */
-  --bg-surface: #1e293b; /* Slate 800 */
+  --bg-dark: #0f172a;
+  /* Slate 900 */
+  --bg-surface: #1e293b;
+  /* Slate 800 */
   --bg-surface-light: #334155;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --border-color: #334155;
-  --accent-color: #ec4899; /* Pink 500 */
-  
+  --accent-color: #ec4899;
+  /* Pink 500 */
+
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --transition-speed: 0.2s;
 }
@@ -133,6 +137,26 @@ body {
   text-overflow: ellipsis;
 }
 
+.sidebar-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity var(--transition-speed), color var(--transition-speed);
+}
+
+.character-item:hover .sidebar-delete-btn {
+  opacity: 1;
+}
+
+.sidebar-delete-btn:hover {
+  color: #ef4444;
+}
+
 /* Chat Area */
 .chat-area {
   flex: 1;
@@ -199,8 +223,15 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .message-wrapper.user {
@@ -255,6 +286,31 @@ body {
   background-color: var(--bg-surface);
   color: var(--text-main);
   border-bottom-left-radius: 4px;
+}
+
+.msg-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.message-wrapper.user .msg-delete-btn {
+  align-self: flex-end;
+}
+
+.message-wrapper:hover .msg-delete-btn {
+  opacity: 1;
+}
+
+.msg-delete-btn:hover {
+  color: #ef4444;
 }
 
 /* Contextual Image */
@@ -333,7 +389,10 @@ body {
 /* Modal Styling */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
   display: flex;
@@ -396,7 +455,8 @@ body {
   color: var(--text-muted);
 }
 
-.form-input, .form-textarea {
+.form-input,
+.form-textarea {
   background-color: var(--bg-dark);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -406,7 +466,8 @@ body {
   font-size: 0.95rem;
 }
 
-.form-input:focus, .form-textarea:focus {
+.form-input:focus,
+.form-textarea:focus {
   outline: none;
   border-color: var(--primary-color);
 }

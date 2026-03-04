@@ -168,6 +168,24 @@ function App() {
     }
   };
 
+  const handleDeleteCharacterFromSidebar = (e, id) => {
+    e.stopPropagation();
+    handleDeleteCharacter(id);
+  };
+
+  const handleDeleteMessage = (messageId) => {
+    if (window.confirm("이 메시지를 삭제하시겠습니까?")) {
+      const updatedChars = characters.map(char => {
+        if (char.id === activeCharId) {
+          return { ...char, messages: char.messages.filter(m => m.id !== messageId) };
+        }
+        return char;
+      });
+      setCharacters(updatedChars);
+      saveCharacters(updatedChars);
+    }
+  };
+
   const saveEditedCharacter = () => {
     if (!editingChar.name) return alert("이름을 입력해주세요.");
 
@@ -248,6 +266,13 @@ function App() {
                     : char.greeting}
                 </div>
               </div>
+              <button
+                className="sidebar-delete-btn"
+                onClick={(e) => handleDeleteCharacterFromSidebar(e, char.id)}
+                title="캐릭터 삭제"
+              >
+                <FiTrash2 />
+              </button>
             </div>
           ))}
           {characters.length === 0 && (
@@ -301,9 +326,16 @@ function App() {
                     </div>
                   )}
 
-                  <div className="message-bubble">
+                  <div className="message-bubble" style={{ position: 'relative' }}>
                     {msg.text}
                   </div>
+                  <button
+                    className="msg-delete-btn"
+                    onClick={() => handleDeleteMessage(msg.id)}
+                    title="메시지 삭제"
+                  >
+                    <FiTrash2 />
+                  </button>
                 </div>
 
                 {msg.role === 'user' && (
