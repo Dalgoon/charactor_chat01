@@ -54,6 +54,8 @@ body {
 
 .sidebar-header {
   padding: 20px;
+  padding-top: max(20px, env(safe-area-inset-top));
+  /* Respect iOS notch */
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
@@ -168,11 +170,16 @@ body {
 
 .chat-header {
   height: 70px;
+  /* Base height */
+  height: calc(70px + env(safe-area-inset-top));
+  /* Expand for iOS notch */
   background-color: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   padding: 0 24px;
+  padding-top: env(safe-area-inset-top);
+  /* Push content down */
   justify-content: space-between;
 }
 
@@ -438,7 +445,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 2000;
+  /* Ensure it covers everything, even safe areas */
 }
 
 .modal-content {
@@ -637,6 +645,8 @@ body {
 
   .chat-header {
     padding: 0 16px;
+    padding-top: env(safe-area-inset-top);
+    /* Keep safe area padding on mobile */
   }
 
   .chat-header-info {
@@ -694,6 +704,8 @@ body {
     max-height: -webkit-fill-available;
     border-radius: 0;
     /* Remove rounded corners */
+    padding-top: env(safe-area-inset-top);
+    /* Push modal content below notch */
   }
 
   .modal-body {
