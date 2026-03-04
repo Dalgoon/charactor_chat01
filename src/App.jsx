@@ -13,7 +13,8 @@ import {
   FiTrash2,
   FiX,
   FiKey,
-  FiImage
+  FiImage,
+  FiMenu
 } from 'react-icons/fi';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
   // Modals state
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isApiKeyOpen, setIsApiKeyOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Edit/Create Character State
   const [editingChar, setEditingChar] = useState(null);
@@ -274,8 +276,13 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>
+      )}
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-title">My AI Characters</div>
           <button className="add-character-btn" onClick={handleAddNewCharacter} title="새 캐릭터 추가">
@@ -288,7 +295,10 @@ function App() {
             <div
               key={char.id}
               className={`character-item ${activeCharId === char.id ? 'active' : ''}`}
-              onClick={() => setActiveCharId(char.id)}
+              onClick={() => {
+                setActiveCharId(char.id);
+                setIsSidebarOpen(false); // Close sidebar on mobile when a character is selected
+              }}
             >
               <img src={char.avatar || 'https://via.placeholder.com/48'} alt={char.name} className="character-avatar" />
               <div className="character-info">
@@ -331,6 +341,9 @@ function App() {
         <main className="chat-area">
           <header className="chat-header">
             <div className="chat-header-info">
+              <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(true)}>
+                <FiMenu />
+              </button>
               <img src={activeChar.avatar} alt={activeChar.name} className="chat-header-avatar" />
               <div className="chat-header-name">{activeChar.name}</div>
             </div>
@@ -415,6 +428,13 @@ function App() {
         </main>
       ) : (
         <main className="chat-area" style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <header className="chat-header" style={{ position: 'absolute', top: 0, left: 0, width: '100%' }}>
+            <div className="chat-header-info">
+              <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(true)}>
+                <FiMenu />
+              </button>
+            </div>
+          </header>
           <div style={{ color: 'var(--text-muted)' }}>왼쪽에서 캐릭터를 선택하거나 새로 생성해주세요.</div>
         </main>
       )}
