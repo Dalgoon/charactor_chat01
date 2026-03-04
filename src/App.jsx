@@ -422,12 +422,12 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">첫 인사말</label>
-                <input
-                  type="text"
-                  className="form-input"
+                <label className="form-label">첫 인사말 (줄바꿈 가능)</label>
+                <textarea
+                  className="form-textarea"
                   value={editingChar.greeting}
                   onChange={(e) => setEditingChar({ ...editingChar, greeting: e.target.value })}
+                  style={{ height: '80px' }}
                 />
               </div>
 
@@ -497,7 +497,9 @@ function App() {
               ) : <div></div>}
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button className="btn-secondary" onClick={() => setIsSettingsOpen(false)}>취소</button>
-                <button className="btn-primary" onClick={saveEditedCharacter}>저장</button>
+                <button className="btn-primary" onClick={saveEditedCharacter}>
+                  {editingChar.id.startsWith('new_') ? '설정 저장 후 대화 시작' : '저장하기'}
+                </button>
               </div>
             </div>
           </div>
