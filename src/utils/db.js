@@ -224,8 +224,27 @@ export const parseSituationFromText = (text, character) => {
 
   if (matches.length > 0) {
     matches.forEach(match => {
-      const situation = match[1];
-      const foundImage = character.imageMap.find(img => img.situation === situation);
+      const situationTag = match[1].trim();
+
+      // 1. Exact match first
+      let foundImage = character.imageMap.find(img => img.situation === situationTag);
+
+      // 2. Fuzzy match if exact match fails
+      if (!foundImage) {
+        // AI가 출력한 태그를 분할 (예: "활짝 웃음" -> ["활짝", "웃음"])
+        const tagKeywords = situationTag.split(/[\s/,]+/).filter(Boolean);
+
+        foundImage = character.imageMap.find(img => {
+          // 맵에 등록된 태그 분할 (예: "미소/웃음" -> ["미소", "웃음"])
+          const mapKeywords = img.situation.split(/[\s/,]+/).filter(Boolean);
+
+          // 태그 양쪽 키워드 중 하나라도 교집합이 있거나 포함되어 있으면 매칭 간주
+          return tagKeywords.some(keyword =>
+            mapKeywords.some(mk => mk.includes(keyword) || keyword.includes(mk))
+          );
+        });
+      }
+
       if (foundImage) {
         situationUrls.push(foundImage.url);
       } else {

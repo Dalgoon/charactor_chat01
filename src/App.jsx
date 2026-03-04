@@ -108,6 +108,29 @@ function App() {
     }, 10);
   };
 
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  const handleInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      if (isMobile) {
+        // 모바일: Enter 키는 기본 줄바꿈 허용 (전송 안 함)
+        return;
+      }
+      // 데스크탑: Shift 안 누른 Enter는 전송, 누른 Enter는 줄바꿈 허용
+      if (!e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage(e);
+      }
+    }
+  };
+
+  const handleInputText = (e) => {
+    setInputMessage(e.target.value);
+    // 높이 자동 조절
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim() || !activeChar || isLoading) return;
@@ -135,6 +158,9 @@ function App() {
     setCharacters(updatedChars);
     saveCharacters(updatedChars);
     setInputMessage('');
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto'; // 입력란 높이 초기화
+    }
     setIsLoading(true);
 
     try {
@@ -612,14 +638,15 @@ function App() {
 
           <form className="input-area" onSubmit={handleSendMessage}>
             <div className="input-container">
-              <input
-                type="text"
+              <textarea
                 className="message-input"
                 placeholder="메시지를 입력하세요..."
                 value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
+                onChange={handleInputText}
+                onKeyDown={handleInputKeyDown}
                 disabled={isLoading}
                 ref={inputRef}
+                rows={1}
               />
               <button
                 type="button"
