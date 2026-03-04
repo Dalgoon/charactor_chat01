@@ -320,8 +320,8 @@ body {
   margin-bottom: 8px;
   border-radius: 12px;
   overflow: hidden;
-  max-width: 500px;
-  /* 크기를 300px에서 500px로 증가 */
+  max-width: 1000px;
+  /* 크기를 1000px로 더욱 증가 */
   width: 100%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
