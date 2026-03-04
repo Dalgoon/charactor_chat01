@@ -31,14 +31,16 @@ export const generateChatResponse = async (ai, character, chatHistory, userMessa
         // Add instruction for image mapping behavior
         if (character.imageMap && character.imageMap.length > 0) {
             const situationsList = character.imageMap.map(img => `[${img.situation}]`).join(', ');
+            const requiredImageCount = character.maxImages || 1;
+
             systemInstruction += `\n\n[최우선 필수 지시사항]
 대화의 맥락에 따라 현재 당신의 감정이나 상황을 파악하여, *반드시* 답변의 가장 첫 부분에 다음 중 하나의 태그를 대괄호로 감싸서 출력하십시오.
 사용 가능한 태그 (이 중에서만 선택하고 절대 새로운 태그를 만들지 마세요): ${situationsList}
-예시: "${character.imageMap[0] ? `[${character.imageMap[0].situation}]` : '[평온]'
-                } 흥, 네가 웬일이냐?"
+예시: "${character.imageMap[0] ? `[${character.imageMap[0].situation}]` : '[평온]'} 흥, 네가 웬일이냐?"
 수칙:
 1. 태그명은 반드시 제시된 것과 정확히 일치해야 합니다. (오타 금지)
-2. 답변을 시작할 때 단 한 번만 태그를 작성하세요.`;
+2. 답변을 시작할 때 반드시 ${requiredImageCount}개의 태그를 연달아 작성하세요. (예: 2개일 경우 [상황1][상황2])
+3. 지정된 개수(${requiredImageCount}개)보다 적게 쓰거나 많이 쓰지 마십시오.`;
         }
 
         // 2. Format chat history for the API

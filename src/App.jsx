@@ -717,7 +717,7 @@ function App() {
               </div>
 
               <div className="form-group" style={{ marginBottom: '10px' }}>
-                <label className="form-label">한 번에 출력할 최대 이미지 장수 🖼️</label>
+                <label className="form-label">기본 출력 이미지 장수 (필수) 🖼️</label>
                 <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
                   {[1, 2, 3].map(num => (
                     <label key={num} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
@@ -733,7 +733,7 @@ function App() {
                     </label>
                   ))}
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>AI가 답변당 띄울 수 있는 이미지 개수를 제한합니다.</p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>AI가 답변당 반드시 출력하게 될 이미지 개수를 지정합니다.</p>
               </div>
 
               <div className="form-group" style={{
