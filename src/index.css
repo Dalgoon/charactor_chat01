@@ -389,6 +389,8 @@ body {
   align-items: center;
   justify-content: center;
   transition: color 0.2s;
+  flex-shrink: 0;
+  /* Prevent button from shrinking */
 }
 
 .action-insert-btn:hover:not(:disabled) {
@@ -412,6 +414,8 @@ body {
   align-items: center;
   cursor: pointer;
   transition: transform 0.1s;
+  flex-shrink: 0;
+  /* Prevent button from shrinking */
 }
 
 .send-btn:hover {
