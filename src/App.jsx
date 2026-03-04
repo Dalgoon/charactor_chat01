@@ -365,7 +365,7 @@ function App() {
 
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '15px' }}>
+        <div style={{ padding: '20px', paddingTop: 'max(20px, env(safe-area-inset-top))', borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '15px' }}>
           {/* Persona Selector section */}
           <div className="persona-selector-container" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '5px', backgroundColor: 'var(--bg-dark)', borderRadius: '8px' }}>
             <img src={activePersona?.avatar || 'https://via.placeholder.com/36'} alt="My Persona" className="character-avatar" style={{ margin: 0, width: '36px', height: '36px' }} />
