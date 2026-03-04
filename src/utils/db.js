@@ -39,14 +39,15 @@ export const saveCharacters = (characters) => {
 };
 
 export const parseSituationFromText = (text, character) => {
-  // text 예시: "[부끄러움] 아, 뭐라는거야 진짜..."
-  const match = text.match(/^\[(.*?)\]/);
+  // text 예시: "[부끄러움] 아, 뭐라는거야 진짜..." 또는 줄바꿈 후 "[기쁨]" 등
+  // ^ 제거하여 텍스트 중간이나 앞에 공백이 있어도 첫 번째 대괄호 태그를 찾도록 완화
+  const match = text.match(/\[(.*?)\]/);
   let situationUrl = null;
   let cleanText = text;
 
   if (match) {
     const situation = match[1];
-    cleanText = text.replace(/^\[.*?\]\s*/, ''); // 앞의 태그 제거
+    cleanText = text.replace(/\[.*?\]\s*/, '').trim(); // 첫 번째 태그만 제거하고 공백 정리
 
     // imageMap에서 일치하는 상황 찾기
     const foundImage = character.imageMap.find(img => img.situation === situation);
