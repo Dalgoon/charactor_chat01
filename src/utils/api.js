@@ -10,10 +10,23 @@ export const initGeminiAPI = (apiKey) => {
     return new GoogleGenAI({ apiKey: apiKey });
 };
 
-export const generateChatResponse = async (ai, character, chatHistory, userMessage) => {
+export const generateChatResponse = async (ai, character, chatHistory, userMessage, activePersona) => {
     try {
         // 1. Build context based on character instruction
         let systemInstruction = character.systemPrompt;
+
+        // Add global OOC instruction
+        systemInstruction += `\n\n[OOC (Out Of Character) / 시스템 절대 규칙]
+사용자가 괄호 ( )를 사용하거나 'OOC:' 등의 키워드로 역할극 밖의 대화나 지시를 건넬 경우, 캐릭터의 입장을 잠시 벗어나 디렉터로서 사용자의 피드백이나 지시에 순응하여 롤플레잉 외적인 답변을 수행하십시오.`;
+
+        // Add Active Persona Context
+        if (activePersona) {
+            systemInstruction += `\n\n[현재 대화하는 상대(유저)의 설정]
+이름: ${activePersona.name}
+배경 및 성격: ${activePersona.personaPrompt}
+당신은 위 설정의 유저와 대화하고 있습니다. 역할극의 몰입을 위해 유저의 설정에 맞추어 유저를 대우하며 반응하십시오.`;
+        }
+
 
         // Add instruction for image mapping behavior
         if (character.imageMap && character.imageMap.length > 0) {

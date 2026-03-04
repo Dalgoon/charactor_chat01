@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   loadCharacters,
   saveCharacters,
+  loadPersonas,
+  savePersonas,
   parseSituationFromText,
   LOCAL_STORAGE_KEY
 } from './utils/db';
@@ -30,6 +32,12 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isApiKeyOpen, setIsApiKeyOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isPersonaSettingsOpen, setIsPersonaSettingsOpen] = useState(false);
+
+  // User Personas state
+  const [personas, setPersonas] = useState([]);
+  const [activePersonaId, setActivePersonaId] = useState(null);
+  const [editingPersona, setEditingPersona] = useState(null);
 
   // Edit/Create Character State
   const [editingChar, setEditingChar] = useState(null);
@@ -45,12 +53,19 @@ function App() {
       setActiveCharId(savedChars[0].id);
     }
 
+    const savedPersonas = loadPersonas();
+    setPersonas(savedPersonas);
+    if (savedPersonas.length > 0) {
+      setActivePersonaId(savedPersonas[0].id);
+    }
+
     const savedKey = localStorage.getItem('gemini_api_key');
     if (savedKey) setApiKey(savedKey);
     else setIsApiKeyOpen(true);
   }, []);
 
   const activeChar = characters.find(c => c.id === activeCharId) || null;
+  const activePersona = personas.find(p => p.id === activePersonaId) || null;
 
   useEffect(() => {
     scrollToBottom();
@@ -129,8 +144,9 @@ function App() {
       const rawResponse = await generateChatResponse(
         ai,
         currentChar,
-        currentChar.messages.slice(0, -1), // Everything except the message we just added (wait, actually SDK needs history BEFORE the current message)
-        newMessage.text // The current message
+        currentChar.messages.slice(0, -1), // Everything except the message we just added
+        newMessage.text, // The current message
+        activePersona // Pass the active user persona
       );
 
       // 2. Parse Contextual Tags (e.g. [기쁨] 안녕!)
@@ -269,6 +285,55 @@ function App() {
     setEditingChar(null);
   };
 
+  // Persona Management Handlers
+  const handleAddNewPersona = () => {
+    setEditingPersona({
+      id: 'user_' + Date.now(),
+      name: '새 주인공',
+      avatar: 'https://via.placeholder.com/48?text=New',
+      personaPrompt: ''
+    });
+    setIsPersonaSettingsOpen(true);
+  };
+
+  const handleEditPersona = (persona) => {
+    setEditingPersona({ ...persona });
+    setIsPersonaSettingsOpen(true);
+  };
+
+  const handleDeletePersona = (id) => {
+    if (personas.length <= 1) {
+      return alert("최소 1개의 프로필은 유지해야 합니다.");
+    }
+    if (window.confirm("이 주인공 프로필을 삭제하시겠습니까?")) {
+      const newPersonas = personas.filter(p => p.id !== id);
+      setPersonas(newPersonas);
+      savePersonas(newPersonas);
+      if (activePersonaId === id) {
+        setActivePersonaId(newPersonas[0].id);
+      }
+    }
+  };
+
+  const saveEditedPersona = () => {
+    if (!editingPersona.name) return alert("주인공 이름을 입력해주세요.");
+
+    let newPersonas;
+    const isNew = editingPersona.id.startsWith('user_') && !personas.find(p => p.id === editingPersona.id);
+
+    if (isNew) {
+      newPersonas = [...personas, editingPersona];
+      setActivePersonaId(editingPersona.id);
+    } else {
+      newPersonas = personas.map(p => p.id === editingPersona.id ? editingPersona : p);
+    }
+
+    setPersonas(newPersonas);
+    savePersonas(newPersonas);
+    setIsPersonaSettingsOpen(false);
+    setEditingPersona(null);
+  };
+
   // Image Map Handlers
   const addImageMapRow = () => {
     setEditingChar({
@@ -300,11 +365,34 @@ function App() {
 
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <div className="sidebar-title">My AI Characters</div>
-          <button className="add-character-btn" onClick={handleAddNewCharacter} title="새 캐릭터 추가">
-            <FiPlus />
-          </button>
+        <div className="sidebar-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '15px' }}>
+          {/* Persona Selector section */}
+          <div className="persona-selector-container" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '5px', backgroundColor: 'var(--bg-dark)', borderRadius: '8px' }}>
+            <img src={activePersona?.avatar || 'https://via.placeholder.com/36'} alt="My Persona" className="character-avatar" style={{ margin: 0, width: '36px', height: '36px' }} />
+            <select
+              value={activePersonaId || ''}
+              onChange={(e) => setActivePersonaId(e.target.value)}
+              className="form-input"
+              style={{ flex: 1, padding: '6px', fontSize: '0.9rem', border: 'none' }}
+            >
+              {personas.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+            <button className="settings-btn" onClick={() => handleEditPersona(activePersona)} title="내 프로필 설정" style={{ fontSize: '1rem', padding: '4px' }}>
+              <FiSettings />
+            </button>
+            <button className="add-character-btn" style={{ width: '28px', height: '28px' }} onClick={handleAddNewPersona} title="새 프로필 추가">
+              <FiPlus />
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="sidebar-title">My AI Characters</div>
+            <button className="add-character-btn" onClick={handleAddNewCharacter} title="새 캐릭터 추가">
+              <FiPlus />
+            </button>
+          </div>
         </div>
 
         <div className="character-list">
@@ -418,7 +506,11 @@ function App() {
                 </div>
 
                 {msg.role === 'user' && (
-                  <div className="message-avatar" style={{ backgroundColor: 'var(--primary-color)' }}></div>
+                  <img
+                    src={activePersona?.avatar || 'https://via.placeholder.com/36'}
+                    alt="user avatar"
+                    className="message-avatar"
+                  />
                 )}
               </div>
             ))}
@@ -617,6 +709,63 @@ function App() {
                 <button className="btn-primary" onClick={saveEditedCharacter}>
                   {editingChar.id.startsWith('new_') ? '설정 저장 후 대화 시작' : '저장하기'}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Persona Settings Modal */}
+      {isPersonaSettingsOpen && editingPersona && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2 className="modal-title">{editingPersona.id.startsWith('user_') && !personas.find(p => p.id === editingPersona.id) ? '새 주인공 만들기' : '내 주인공(페르소나) 설정'}</h2>
+              <button className="close-btn" onClick={() => setIsPersonaSettingsOpen(false)}><FiX /></button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label className="form-label">이름</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={editingPersona.name}
+                  onChange={(e) => setEditingPersona({ ...editingPersona, name: e.target.value })}
+                  placeholder="예: 건방진 학생"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">아이콘 (URL)</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={editingPersona.avatar}
+                  onChange={(e) => setEditingPersona({ ...editingPersona, avatar: e.target.value })}
+                  placeholder="아이콘 이미지 링크"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">주인공 성격 및 배경 설정 (프롬프트 주입)</label>
+                <textarea
+                  className="form-textarea"
+                  value={editingPersona.personaPrompt}
+                  onChange={(e) => setEditingPersona({ ...editingPersona, personaPrompt: e.target.value })}
+                  placeholder="AI에게 인식될 내 설정입니다. 예: 매사에 건방지고 도발적이다."
+                  style={{ height: '150px' }}
+                />
+              </div>
+            </div>
+            <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
+              {(!editingPersona.id.startsWith('user_') || personas.find(p => p.id === editingPersona.id)) ? (
+                <button className="btn-secondary" style={{ color: '#ef4444', borderColor: '#ef4444' }} onClick={() => handleDeletePersona(editingPersona.id)}>
+                  프로필 삭제
+                </button>
+              ) : <div></div>}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button className="btn-secondary" onClick={() => setIsPersonaSettingsOpen(false)}>취소</button>
+                <button className="btn-primary" onClick={saveEditedPersona}>저장하기</button>
               </div>
             </div>
           </div>

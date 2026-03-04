@@ -1,4 +1,20 @@
 export const LOCAL_STORAGE_KEY = 'ai_characters_db';
+export const PERSONAS_STORAGE_KEY = 'user_personas_db';
+
+export const defaultPersonas = [
+  {
+    id: 'user_default',
+    name: '유저',
+    avatar: 'https://via.placeholder.com/48?text=U',
+    personaPrompt: '나는 평범한 학생이다.'
+  },
+  {
+    id: 'user_confident',
+    name: '건방진 학생',
+    avatar: 'https://via.placeholder.com/48?text=C',
+    personaPrompt: '나는 매사에 자신감이 넘치고, 교사 앞에서도 절대 기죽지 않는 건방지고 도발적인 학생이다. 반말과 존댓말을 섞어 쓴다.'
+  }
+];
 
 export const defaultCharacters = [
   {
@@ -217,6 +233,20 @@ export const loadCharacters = () => {
 
 export const saveCharacters = (characters) => {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(characters));
+};
+
+// Persona Management
+export const loadPersonas = () => {
+  const data = localStorage.getItem(PERSONAS_STORAGE_KEY);
+  if (!data) {
+    savePersonas(defaultPersonas);
+    return defaultPersonas;
+  }
+  return JSON.parse(data);
+};
+
+export const savePersonas = (personas) => {
+  localStorage.setItem(PERSONAS_STORAGE_KEY, JSON.stringify(personas));
 };
 
 export const parseSituationFromText = (text, character) => {
