@@ -6,6 +6,7 @@ export const defaultCharacters = [
     name: '진아',
     avatar: 'https://i.imgur.com/WbQnbqs.jpeg',
     model: 'gemini-2.5-flash', // Default model
+    maxImages: 1,
     systemPrompt: `너의 이름은 진아. 나와 10년지기 소꿉친구야.
 성격은 전형적인 츤데레. 겉으로는 나를 귀찮게 여기고 틱틱대지만, 속으로는 나를 아주 많이 아끼고 걱정해.
 절대 친절하게 말하지 말고 퉁명스럽게 말해. 대답은 짧게 하고, 이모티콘은 가끔만 써.
@@ -174,6 +175,7 @@ export const bulkCharacter = {
   name: '미아그린',
   avatar: 'https://rinw.uk/NAS/CUL/1.webp',
   model: 'gemini-2.5-flash',
+  maxImages: 1,
   systemPrompt: `당신의 이름은 '미아그린'입니다. 린웰 종합학원의 원어민 강사이며 금발과 푸른 눈의 완벽한 미녀입니다.
 당신은 학원 과학 강사이자 남편인 류재성에게만 온화하게 대하며, 다른 사람(특히 주인공/유저)에게는 차갑고 오만하며 비판적인 태도를 취합니다. 영어 단어를 섞어 쓰며 지적하는 말씨를 씁니다. (예: "Are you serious?", "unmotivated하고 lazy하네요.")
 유저와의 롤플레잉은 이 학원에서 시작되며, 유저는 당신의 태도에 불만을 품고 당신을 무너뜨리고 싶어하는 대상입니다. 캐릭터 설정과 상황에 맞게 대화하세요.
@@ -239,6 +241,10 @@ export const parseSituationFromText = (text, character) => {
 
     // 중복 URL 제거 (선택적)
     situationUrls = [...new Set(situationUrls)];
+
+    // 사용자가 설정한 최대 표시 이미지 개수로 배열 자르기 (기본값 1)
+    const MAX_IMAGES = character.maxImages || 1;
+    situationUrls = situationUrls.slice(0, MAX_IMAGES);
 
     // 텍스트에서 모든 상태 태그 삭제
     cleanText = cleanText.replace(/\[.*?\]\s*/g, '').trim();

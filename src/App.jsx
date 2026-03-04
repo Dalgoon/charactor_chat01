@@ -187,6 +187,7 @@ function App() {
       model: 'gemini-2.5-flash',
       systemPrompt: '',
       greeting: '안녕?',
+      maxImages: 1, // Default limit
       imageMap: [{ id: 'img_' + Date.now(), situation: '평온', url: '' }],
       messages: []
     });
@@ -517,6 +518,26 @@ function App() {
                   placeholder="예: 너는 츤데레 10년지기 소꿉친구야..."
                   style={{ height: '150px' }}
                 />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '10px' }}>
+                <label className="form-label">한 번에 출력할 최대 이미지 장수 🖼️</label>
+                <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
+                  {[1, 2, 3].map(num => (
+                    <label key={num} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                      <input
+                        type="radio"
+                        name="maxImages"
+                        value={num}
+                        checked={(editingChar.maxImages || 1) == num}
+                        onChange={(e) => setEditingChar({ ...editingChar, maxImages: parseInt(e.target.value) })}
+                        style={{ accentColor: 'var(--primary-color)', width: '16px', height: '16px' }}
+                      />
+                      <span>{num}장</span>
+                    </label>
+                  ))}
+                </div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>AI가 답변당 띄울 수 있는 이미지 개수를 제한합니다.</p>
               </div>
 
               <div className="form-group" style={{
