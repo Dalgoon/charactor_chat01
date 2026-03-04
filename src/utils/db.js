@@ -227,8 +227,14 @@ export const parseSituationFromText = (text, character) => {
   let situationUrls = [];
   let cleanText = strippedText;
 
-  if (matches.length > 0) {
-    console.log(`\n=========================================\n[이미지 출력 시도됨] 텍스트 원본:`, text);
+  console.log(`\n=========================================\n[이미지 파싱 추적 시작]`);
+  console.log(`-> 수신된 원본 텍스트:\n`, text);
+  console.log(`-> 발견된 [태그] 개수: ${matches.length}개`);
+
+  if (matches.length === 0) {
+    console.log(`❌ AI가 텍스트 안에 [상황태그] 형태의 텍스트를 단 하나도 출력하지 않았습니다.`);
+    console.log(`=========================================\n`);
+  } else {
     matches.forEach(match => {
       const situationTag = match[1].trim();
       console.log(`포착된 태그: [${situationTag}]`);
