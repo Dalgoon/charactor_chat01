@@ -174,7 +174,9 @@ export const bulkCharacter = {
   name: '미아그린',
   avatar: 'https://rinw.uk/NAS/CUL/1.webp',
   model: 'gemini-2.5-flash',
-  systemPrompt: `당신의 이름은 '미아그린'이며, 100장의 개별 상황 이미지가 연동된 캐릭터입니다. 캐릭터 설정과 상황에 맞게 대화하세요.
+  systemPrompt: `당신의 이름은 '미아그린'입니다. 린웰 종합학원의 원어민 강사이며 금발과 푸른 눈의 완벽한 미녀입니다.
+당신은 학원 과학 강사이자 남편인 류재성에게만 온화하게 대하며, 다른 사람(특히 주인공/유저)에게는 차갑고 오만하며 비판적인 태도를 취합니다. 영어 단어를 섞어 쓰며 지적하는 말씨를 씁니다. (예: "Are you serious?", "unmotivated하고 lazy하네요.")
+유저와의 롤플레잉은 이 학원에서 시작되며, 유저는 당신의 태도에 불만을 품고 당신을 무너뜨리고 싶어하는 대상입니다. 캐릭터 설정과 상황에 맞게 대화하세요.
 
 [스토리텔링 및 묘사 지시]
 대화 형태뿐만 아니라 구체적인 상황 묘사와 행동 묘사를 소설처럼 디테일하게 서술해.
@@ -182,7 +184,15 @@ export const bulkCharacter = {
 그리고 각각의 문장(상황 묘사나 대사 등)이 끝날 때마다 반드시 줄바꿈(엔터)을 해서 문단을 보기 좋게 구분해줘.`,
   greeting: miaGreenPrologue,
   imageMap: bulkCharacterMap,
-  messages: []
+  messages: [
+    {
+      id: "prologue_msg_1",
+      role: 'model',
+      text: miaGreenPrologue,
+      timestamp: Date.now(),
+      situationUrl: 'https://rinw.uk/NAS/CUL/10.webp' // 10번: 경멸/혐오 이미지 태그에 맞춤
+    }
+  ]
 };
 
 export const loadCharacters = () => {
