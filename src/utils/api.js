@@ -84,8 +84,37 @@ export const generateChatResponse = async (ai, character, chatHistory, userMessa
             history: history
         });
 
-        const response = await chatWithHistory.sendMessage({ message: userMessage });
-        return response.text;
+        const requiredImageCount = character.maxImages || 1;
+        let attempt = 0;
+        const maxAttempts = 3;
+        let responseText = "";
+        let currentMessage = userMessage;
+
+        while (attempt < maxAttempts) {
+            const response = await chatWithHistory.sendMessage({ message: currentMessage });
+            responseText = response.text;
+
+            // Use the same regex used in db.js to count tags
+            let strippedText = responseText.replace(/<!--[\s\S]*?-->/g, '').replace(/<\/?[a-z][a-z0-9]*[^>]*>/ig, '');
+            const matches = [...strippedText.matchAll(/\[(.*?)\]/g)];
+
+            // Check if AI generated the required amount of tags
+            if (matches.length >= requiredImageCount || character.imageMap?.length === 0) {
+                break; // Success! Generated enough tags (or character doesn't use tags)
+            } else {
+                console.warn(`[Auto-Retry API] AI가 태그 지시를 어겼습니다. (요구: ${requiredImageCount}개, 발견: ${matches.length}개). 재시도 중... (${attempt + 1}/${maxAttempts})`);
+                attempt++;
+                if (attempt >= maxAttempts) {
+                    console.error(`[Auto-Retry API] 최대 재시도 횟수 초과. 불완전한 텍스트로 폴백합니다.`);
+                    break;
+                }
+
+                // If failed, command the AI to fix its mistake in the same conversation thread
+                currentMessage = `[시스템 강제 경고: 당신은 직전 대답에서 대화 맨 처음에 상황 태그 [상황] 형태를 반드시 ${requiredImageCount}개 연속으로 작성하라는 최우선 지시를 어겼습니다. (발견된 태그 개수: ${matches.length}개). 지시사항 서식 규칙을 다시 한번 완벽히 체크한 뒤, 방금 전의 대답을 수정하여 태그 규칙에 맞게 다시 출력하십시오.]`;
+            }
+        }
+
+        return responseText;
 
     } catch (error) {
         console.error("Gemini API Error:", error);
