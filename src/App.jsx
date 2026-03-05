@@ -17,7 +17,9 @@ import {
   FiKey,
   FiImage,
   FiMenu,
-  FiCopy
+  FiCopy,
+  FiArrowUp,
+  FiArrowDown
 } from 'react-icons/fi';
 import defaultMiaPrompt from '../[미아그린]시스템프롬프트.txt?raw';
 
@@ -46,6 +48,7 @@ function App() {
   const [editingChar, setEditingChar] = useState(null);
 
   const messagesEndRef = useRef(null);
+  const messageListRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -74,8 +77,20 @@ function App() {
     scrollToBottom();
   }, [activeChar?.messages, isLoading]);
 
+  useEffect(() => {
+    if (appPhase === 'chat') {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [appPhase]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToTop = () => {
+    messageListRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSaveApiKey = (key) => {
@@ -555,7 +570,7 @@ function App() {
             </button>
           </header>
 
-          <div className="message-list">
+          <div className="message-list" ref={messageListRef}>
             {activeChar.messages.map(msg => (
               <div key={msg.id} className={`message-wrapper ${msg.role === 'user' ? 'user' : 'ai'}`}>
                 {msg.role === 'model' && (
@@ -613,6 +628,15 @@ function App() {
               </div>
             )}
             <div ref={messagesEndRef} />
+          </div>
+
+          <div className="scroll-remote">
+            <button className="scroll-btn" onClick={scrollToTop} title="맨 위로 가기">
+              <FiArrowUp />
+            </button>
+            <button className="scroll-btn" onClick={scrollToBottom} title="최신 대화로 가기">
+              <FiArrowDown />
+            </button>
           </div>
 
           <form className="input-area" onSubmit={handleSendMessage}>
