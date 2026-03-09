@@ -1,8 +1,12 @@
 export const LOCAL_STORAGE_KEY = 'ai_characters_db';
 export const PERSONAS_STORAGE_KEY = 'user_personas_db';
 
-import defaultMiaPrompt from '../../[미아그린]시스템프롬프트.txt?raw';
-import defaultMiaPrologue from '../../미아그린 프롤로그.txt?raw';
+import defaultMiaPrompt from '../../[미아그린]/[미아그린]시스템프롬프트.txt?raw';
+import defaultMiaPrologue from '../../[미아그린]/미아그린 프롤로그.txt?raw';
+
+import defaultPengkoPrompt from '../../[펭코]/펭코 시스템 프롬프트.txt?raw';
+import defaultPengkoPrologue from '../../[펭코]/펭코 프롤로그.txt?raw';
+import pengkoTagsData from '../../[펭코]/펭코, 이미지 태그 및 url.txt?raw';
 
 export const defaultPersonas = [
   {
@@ -184,20 +188,87 @@ export const bulkCharacter = {
   ]
 };
 
+export const pengkoCharacterMap = pengkoTagsData.trim().split('\n').map((line, index) => {
+  const lineStr = line.trim();
+  if (!lineStr) return null;
+  const match = lineStr.match(/^(https?:\/\/\S+)\s+\[(.*?)\]$/);
+  if (match) {
+    return {
+      id: `img_pengko_${index}`,
+      situation: match[2],
+      url: match[1]
+    };
+  }
+  return null;
+}).filter(Boolean);
+
+export const pengkoCharacter = {
+  id: 'char_pengko',
+  name: '펭코',
+  avatar: 'https://i.imgur.com/5MszrLO.png',
+  model: 'gemini-2.5-flash',
+  maxImages: 1,
+  systemPrompt: defaultPengkoPrompt,
+  greeting: defaultPengkoPrologue,
+  imageMap: pengkoCharacterMap,
+  messages: [
+    {
+      id: "prologue_msg_pengko_1",
+      role: 'model',
+      text: defaultPengkoPrologue,
+      timestamp: Date.now(),
+      situationUrl: 'https://i.imgur.com/IgJs6tX.png'
+    }
+  ]
+};
+
 export const loadCharacters = () => {
   const data = localStorage.getItem(LOCAL_STORAGE_KEY);
   if (!data) {
-    const initialChars = [...defaultCharacters, bulkCharacter];
+    const initialChars = [...defaultCharacters, bulkCharacter, pengkoCharacter];
     saveCharacters(initialChars);
     return initialChars;
   }
 
   const parsed = JSON.parse(data);
+  let changed = false;
+
   // 기존 유저의 로컬 스토리지 데이터에 미아그린이 없다면 자동 추가
-  if (!parsed.find(c => c.id === 'char_miagreen')) {
+  const mia = parsed.find(c => c.id === 'char_miagreen');
+  if (!mia) {
     parsed.push(bulkCharacter);
+    changed = true;
+  } else {
+    // 미아그린의 시스템 프롬프트를 텍스트 파일의 내용으로 강제 고정
+    mia.systemPrompt = defaultMiaPrompt;
+    mia.greeting = defaultMiaPrologue;
+    mia.imageMap = bulkCharacterMap;
+    if (mia.messages.length > 0 && mia.messages[0].id === "prologue_msg_1") {
+      mia.messages[0].text = defaultMiaPrologue;
+    }
+    changed = true;
+  }
+
+  // 기존 유저의 로컬 스토리지 데이터에 펭코가 없다면 자동 추가
+  const pengko = parsed.find(c => c.id === 'char_pengko');
+  if (!pengko) {
+    parsed.push(pengkoCharacter);
+    changed = true;
+  } else {
+    // 펭코의 시스템 프롬프트를 텍스트 파일의 내용으로 강제 고정
+    pengko.systemPrompt = defaultPengkoPrompt;
+    pengko.greeting = defaultPengkoPrologue;
+    pengko.imageMap = pengkoCharacterMap;
+    if (pengko.messages.length > 0 && pengko.messages[0].id === "prologue_msg_pengko_1") {
+      pengko.messages[0].text = defaultPengkoPrologue;
+    }
+    changed = true;
+  }
+
+  if (changed) {
     saveCharacters(parsed);
   }
+
   return parsed;
 };
 

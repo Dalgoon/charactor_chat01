@@ -21,7 +21,7 @@ import {
   FiArrowUp,
   FiArrowDown
 } from 'react-icons/fi';
-import defaultMiaPrompt from '../[미아그린]시스템프롬프트.txt?raw';
+import defaultMiaPrompt from '../[미아그린]/[미아그린]시스템프롬프트.txt?raw';
 
 function App() {
   const [characters, setCharacters] = useState([]);
@@ -261,6 +261,38 @@ function App() {
     setIsSettingsOpen(true);
   };
 
+  const handleDuplicateCharacter = (e, charToCopy) => {
+    e.stopPropagation();
+    const newChar = {
+      ...charToCopy,
+      id: 'char_' + Date.now(),
+      name: charToCopy.name + ' (새 대화)',
+      messages: []
+    };
+
+    // Copy only the first message (greeting) if it exists, otherwise use greeting
+    if (charToCopy.messages && charToCopy.messages.length > 0) {
+      newChar.messages = [{
+        ...charToCopy.messages[0],
+        id: Date.now().toString(),
+        timestamp: Date.now()
+      }];
+    } else {
+      newChar.messages = [{
+        id: Date.now().toString(),
+        role: 'model',
+        text: charToCopy.greeting,
+        timestamp: Date.now(),
+        situationUrl: charToCopy.avatar
+      }];
+    }
+
+    const newChars = [...characters, newChar];
+    setCharacters(newChars);
+    saveCharacters(newChars);
+    setActiveCharId(newChar.id);
+  };
+
   const handleDeleteCharacter = (id) => {
     if (window.confirm("정말 이 캐릭터를 삭제하시겠습니까? (대화 내용 모두 삭제)")) {
       const newChars = characters.filter(c => c.id !== id);
@@ -433,13 +465,21 @@ function App() {
           </div>
         </div>
 
-        <div className="persona-home-footer">
+        <div className="persona-home-footer" style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
           <button
             className="btn-primary start-chat-btn"
             onClick={() => setAppPhase('chat')}
             disabled={!activePersonaId}
+            style={{ width: '100%' }}
           >
             선택한 주인공으로 시작하기
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => setIsApiKeyOpen(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            <FiKey /> API Key 설정 변경
           </button>
         </div>
 
@@ -527,13 +567,22 @@ function App() {
                     : char.greeting}
                 </div>
               </div>
-              <button
-                className="sidebar-delete-btn"
-                onClick={(e) => handleDeleteCharacterFromSidebar(e, char.id)}
-                title="캐릭터 삭제"
-              >
-                <FiTrash2 />
-              </button>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <button
+                  className="sidebar-delete-btn"
+                  onClick={(e) => handleDuplicateCharacter(e, char)}
+                  title="새 대화 시작하기 (복사)"
+                >
+                  <FiCopy />
+                </button>
+                <button
+                  className="sidebar-delete-btn"
+                  onClick={(e) => handleDeleteCharacterFromSidebar(e, char.id)}
+                  title="캐릭터 삭제"
+                >
+                  <FiTrash2 />
+                </button>
+              </div>
             </div>
           ))}
           {characters.length === 0 && (
