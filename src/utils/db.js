@@ -66,6 +66,40 @@ export const defaultCharacters = [
   }
 ];
 
+export const chaeharinCharacterMap = chaeharinTagsData.trim().split('\n').map((line, index) => {
+  const lineStr = line.trim();
+  if (!lineStr) return null;
+  const match = lineStr.match(/^(https?:\/\/\S+)\s+\[(.*?)\]$/);
+  if (match) {
+    return {
+      id: `img_chaeharin_${index}`,
+      situation: match[2],
+      url: match[1]
+    };
+  }
+  return null;
+}).filter(Boolean);
+
+export const chaeharinCharacter = {
+  id: 'char_chaeharin',
+  name: '채하린',
+  avatar: 'https://raw.githubusercontent.com/LS-B/sister/refs/heads/main/1.jpg',
+  model: 'gemini-2.5-flash',
+  maxImages: 2,
+  systemPrompt: defaultChaeharinPrompt,
+  greeting: defaultChaeharinPrologue,
+  imageMap: chaeharinCharacterMap,
+  messages: [
+    {
+      id: "prologue_msg_chaeharin_1",
+      role: 'model',
+      text: defaultChaeharinPrologue,
+      timestamp: Date.now(),
+      situationUrls: ['https://raw.githubusercontent.com/LS-B/sister/refs/heads/main/1.jpg'] // [기쁨]
+    }
+  ]
+};
+
 const miaGreenTagsData = `
 1:기본/평소/무표정
 2:미소
@@ -254,39 +288,7 @@ export const hayoonseoCharacter = {
   ]
 };
 
-export const chaeharinCharacterMap = chaeharinTagsData.trim().split('\n').map((line, index) => {
-  const lineStr = line.trim();
-  if (!lineStr) return null;
-  const match = lineStr.match(/^(https?:\/\/\S+)\s+\[(.*?)\]$/);
-  if (match) {
-    return {
-      id: `img_chaeharin_${index}`,
-      situation: match[2],
-      url: match[1]
-    };
-  }
-  return null;
-}).filter(Boolean);
 
-export const chaeharinCharacter = {
-  id: 'char_chaeharin',
-  name: '채하린',
-  avatar: 'https://raw.githubusercontent.com/LS-B/sister/refs/heads/main/1.jpg',
-  model: 'gemini-2.5-flash',
-  maxImages: 2,
-  systemPrompt: defaultChaeharinPrompt,
-  greeting: defaultChaeharinPrologue,
-  imageMap: chaeharinCharacterMap,
-  messages: [
-    {
-      id: "prologue_msg_chaeharin_1",
-      role: 'model',
-      text: defaultChaeharinPrologue,
-      timestamp: Date.now(),
-      situationUrl: 'https://raw.githubusercontent.com/LS-B/sister/refs/heads/main/1.jpg' // [기쁨]
-    }
-  ]
-};
 
 
 export const loadCharacters = () => {
