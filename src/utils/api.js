@@ -41,19 +41,19 @@ export const generateChatResponse = async (ai, character, chatHistory, userMessa
                     : '[평온]';
             }
 
-            systemInstruction += `\n\n[!!! 최우선 필수 시스템 명령: 이미지 출력 !!!]
-당신은 대화 응답을 시작할 때, 텍스트의 맨 첫 부분에 무조건(Absolutely) 아래 제시된 상황 태그를 ${requiredImageCount}개 연속으로 작성해야만 합니다. 이것은 절대 어길 수 없는 시스템 프롬프트 규칙입니다.
+            systemInstruction += `\n\n[!!! 최우선 필수 시스템 명령: 이미지(상황) 태그 출력 !!!]
+당신은 대화 응답을 작성할 때, 대사나 행동 묘사의 중간중간 문맥에 알맞은 위치에 아래 제시된 상황 태그를 총 ${requiredImageCount}개 작성해야만 합니다. 이것은 절대 어길 수 없는 시스템 프롬프트 규칙입니다.
 
 사용 가능한 태그 목록 (이 중에서만 선택할 것): ${situationsList}
 
 [작성 규칙]
-1. 답변의 가장 첫 시작은 무조건 대괄호로 감싼 태그 ${requiredImageCount}개가 연달아 나와야 합니다.
-2. 출력 장수 설정값이 ${requiredImageCount}장이므로, 태그는 무조건 ${requiredImageCount}개여야 합니다. 0개, 1개, 혹은 ${requiredImageCount + 1}개 등 지시된 개수와 다르면 시스템 오류가 발생합니다.
+1. 답변의 첫부분에 태그를 몰아서 쓰지 마세요. 대화의 흐름, 감정선, 행동이 변하는 문장 끝이나 대사 중간중간에 자연스럽게 흩어서 배치하십시오. (총 ${requiredImageCount}개)
+2. 출력 장수 설정값이 ${requiredImageCount}장이므로, 전체 텍스트에 포함된 태그의 총합은 무조건 ${requiredImageCount}개여야 합니다. 이 설정값에 미달하거나 초과하면 시스템 오류가 발생합니다.
 3. 태그는 상황의 흐름이나 감정 변화에 맞게 서로 다른 태그들을 다채롭게 조합하여 작성하세요.
 4. 태그명은 반드시 목록에 제시된 것과 정확히 일치해야 합니다. (오타, 여백 추가, 새로운 태그 창조 절대 금지)
 
-* 올바른 출력 예시 (설정 장수가 ${requiredImageCount}장일 경우):
-"${exampleTags} 네가 여기서 뭘 하는 거지? (이하 대화 내용...)"
+* 올바른 단일 태그 작성 위치 예시 (단, 총 ${requiredImageCount}개가 되도록 본문 곳곳에 여러 개 분산 배치할 것):
+"네가 여기서 뭘 하는 거지?" [의심] 하린이가 눈을 흘긴다. "진짜 어이가 없네." [짜증]
 `;
         }
 
@@ -110,7 +110,7 @@ export const generateChatResponse = async (ai, character, chatHistory, userMessa
                 }
 
                 // If failed, command the AI to fix its mistake in the same conversation thread
-                currentMessage = `[시스템 강제 경고: 당신은 직전 대답에서 대화 맨 처음에 상황 태그 [상황] 형태를 반드시 ${requiredImageCount}개 연속으로 작성하라는 최우선 지시를 어겼습니다. (발견된 태그 개수: ${matches.length}개). 지시사항 서식 규칙을 다시 한번 완벽히 체크한 뒤, 방금 전의 대답을 수정하여 태그 규칙에 맞게 다시 출력하십시오.]`;
+                currentMessage = `[시스템 강제 경고: 당신은 직전 대답에서 대사나 묘사 중간중간에 상황 태그 [상황] 형태를 총 ${requiredImageCount}개 배치하라는 최우선 지시를 어겼습니다. (발견된 텍스트 내 태그 총 개수: ${matches.length}개). 지시사항 서식 규칙을 다시 한번 완벽히 체크한 뒤, 방금 전의 대답을 수정하여 태그 규칙에 맞게 본문 곳곳에 다시 출력하십시오.]`;
             }
         }
 

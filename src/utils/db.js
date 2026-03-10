@@ -390,6 +390,8 @@ export const parseSituationFromText = (text, character) => {
   let situationUrls = [];
   let cleanText = strippedText;
 
+  const MAX_IMAGES = character.maxImages || 1;
+
   console.log(`\n=========================================\n[이미지 파싱 추적 시작]`);
   console.log(`-> 수신된 원본 텍스트:\n`, text);
 
@@ -397,8 +399,13 @@ export const parseSituationFromText = (text, character) => {
   const directUrlMatches = [...cleanText.matchAll(/(https?:\/\/[^\s\]\)]+\.(?:webp|png|jpg|jpeg|gif))/gi)];
   if (directUrlMatches.length > 0) {
     directUrlMatches.forEach(match => {
-      situationUrls.push(match[1]);
-      cleanText = cleanText.replace(match[0], '').trim();
+      const idx = situationUrls.length;
+      if (idx < MAX_IMAGES) {
+        situationUrls.push(match[1]);
+        cleanText = cleanText.replace(match[0], `__IMG_${idx}__`);
+      } else {
+        cleanText = cleanText.replace(match[0], '');
+      }
       console.log(`✅ 직접 출력된 이미지 주소 매칭: ${match[1]}`);
     });
   }
@@ -439,28 +446,26 @@ export const parseSituationFromText = (text, character) => {
         console.log(`✅ 정확히 일치하는 태그 발견: [${situationTag}]`);
       }
 
+      let urlToUse;
       if (foundImage) {
-        situationUrls.push(foundImage.url);
-        console.log(`   -> 적용된 이미지 주소: ${foundImage.url}`);
+        urlToUse = foundImage.url;
+        console.log(`   -> 적용된 이미지 주소: ${urlToUse}`);
       } else {
         const defaultImg = character.imageMap.find(img => img.situation === '평온');
-        const defaultUrl = defaultImg ? defaultImg.url : character.avatar;
-        situationUrls.push(defaultUrl);
+        urlToUse = defaultImg ? defaultImg.url : character.avatar;
         console.log(`❌ 매칭 실패! 기본 이미지(평온)로 대체됨`);
-        console.log(`   -> 적용된 이미지 주소: ${defaultUrl}`);
+        console.log(`   -> 적용된 이미지 주소: ${urlToUse}`);
+      }
+
+      const idx = situationUrls.length;
+      if (idx < MAX_IMAGES) {
+        situationUrls.push(urlToUse);
+        cleanText = cleanText.replace(match[0], `__IMG_${idx}__`);
+      } else {
+        cleanText = cleanText.replace(match[0], '');
       }
     });
     console.log(`=========================================\n`);
-
-    // 중복 URL 제거 (선택적)
-    situationUrls = [...new Set(situationUrls)];
-
-    // 사용자가 설정한 최대 표시 이미지 개수로 배열 자르기 (기본값 1)
-    const MAX_IMAGES = character.maxImages || 1;
-    situationUrls = situationUrls.slice(0, MAX_IMAGES);
-
-    // 텍스트에서 모든 상태 태그 삭제
-    cleanText = cleanText.replace(/\[.*?\]\s*/g, '').trim();
   }
 
   // Fallback for older message format compatibility where situationUrl was a single string

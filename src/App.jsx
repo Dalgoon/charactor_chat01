@@ -227,16 +227,44 @@ function App() {
     }
   };
 
-  const renderMessageText = (text) => {
+  const renderMessageText = (text, situationUrls) => {
     if (!text) return '';
     const parts = text.split('*');
-    if (parts.length === 1) return text;
+    if (parts.length === 1 && !text.includes('__IMG_')) return text;
 
     return parts.map((part, index) => {
-      if (index % 2 === 1) {
-        return <span key={index} className="action-text">*{part}*</span>;
+      const isAction = index % 2 === 1;
+
+      const subParts = part.split(/(__IMG_\d+__)/);
+      if (subParts.length === 1) {
+        if (isAction) {
+          return <span key={`text_${index}`} className="action-text">*{part}*</span>;
+        }
+        return <span key={`text_${index}`}>{part}</span>;
       }
-      return part;
+
+      return subParts.map((subPart, subIdx) => {
+        const imgMatch = subPart.match(/__IMG_(\d+)__/);
+        if (imgMatch) {
+          const imgIndex = parseInt(imgMatch[1], 10);
+          const url = situationUrls && situationUrls[imgIndex];
+          if (url) {
+            return (
+              <div key={`img_${index}_${subIdx}`} className="message-image-container inline-image" style={{ margin: '10px 0' }}>
+                <img src={url} alt={`situation-${imgIndex}`} className="message-image" style={{ borderRadius: '12px', maxWidth: '100%', display: 'block' }} />
+              </div>
+            );
+          }
+          return null;
+        }
+        if (subPart) {
+          if (isAction) {
+            return <span key={`text_${index}_${subIdx}`} className="action-text">*{subPart}*</span>;
+          }
+          return <span key={`text_${index}_${subIdx}`}>{subPart}</span>;
+        }
+        return null;
+      });
     });
   };
 
@@ -639,15 +667,15 @@ function App() {
                       <img src={msg.situationUrl} alt="situation" className="message-image" />
                     </div>
                   )}
-                  {/* For new array of urls */}
-                  {msg.role === 'model' && Array.isArray(msg.situationUrls) && msg.situationUrls.filter(url => url !== activeChar.avatar).map((url, idx) => (
+                  {/* For new array of urls (legacy support: if no inline tags exist, render them at top) */}
+                  {msg.role === 'model' && Array.isArray(msg.situationUrls) && (!msg.text || !msg.text.includes('__IMG_')) && msg.situationUrls.filter(url => url !== activeChar.avatar).map((url, idx) => (
                     <div key={idx} className="message-image-container">
                       <img src={url} alt={`situation-${idx}`} className="message-image" />
                     </div>
                   ))}
 
                   <div className="message-bubble" style={{ position: 'relative' }}>
-                    {renderMessageText(msg.text)}
+                    {renderMessageText(msg.text, msg.situationUrls)}
                   </div>
                   <div className="message-actions">
                     <button
