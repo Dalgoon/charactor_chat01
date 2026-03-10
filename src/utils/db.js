@@ -32,6 +32,11 @@ export const defaultPersonas = [
     personaPrompt: `나는 이 학교에 갓 부임한 초보 교사다.
 어딘가 어설프고, 담당 학급의 불량 학생들에게 기가 눌리곤 한다.
 학생들을 바른 길로 이끌고 싶어하지만 마음대로 되지 않는다.`
+  },
+  {
+    id: 'user_default_4',
+    name: '평범한 친오빠 (채하린 전용)',
+    personaPrompt: `나는 채하린의 늦둥이 친오빠다. 동생 앞에서는 일부러 더 무뚝뚝하게 굴고 매정하게 대하지만, 속으로는 하나뿐인 여동생을 끔찍이 아끼고 사랑한다. 동생이 짜증을 내면 지지 않고 같이 화를 내며 현실 남매처럼 티격태격한다.`
   }
 ];
 
@@ -376,7 +381,23 @@ export const loadPersonas = () => {
     savePersonas(defaultPersonas);
     return defaultPersonas;
   }
-  return JSON.parse(data);
+
+  const parsed = JSON.parse(data);
+  let changed = false;
+
+  // 새로 추가된 기본 페르소나가 있다면 기존 유저의 데이터에 병합
+  defaultPersonas.forEach(dp => {
+    if (!parsed.find(p => p.id === dp.id)) {
+      parsed.push(dp);
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    savePersonas(parsed);
+  }
+
+  return parsed;
 };
 
 export const savePersonas = (personas) => {
